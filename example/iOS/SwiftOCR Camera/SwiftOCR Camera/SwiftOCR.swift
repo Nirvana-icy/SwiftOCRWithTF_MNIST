@@ -37,7 +37,7 @@ public var recognizableCharacters = "0123456789"
 open class SwiftOCR {
     
 //    fileprivate     var network = globalNetwork
-//    fileprivate     var xgDigitalRecognizeService = XGDigitalRecognizeService()
+    fileprivate     var xgDigitalRecognizeService = XGDigitalRecognizeService()
     
     //MARK: Setup
     
@@ -66,7 +66,7 @@ open class SwiftOCR {
     //MARK: Init
     public   init(){}
     
-    public   init(image: OCRImage, delegate: SwiftOCRDelegate?, _ completionHandler: @escaping (String) -> Void){
+    public   init(image: UIImage, delegate: SwiftOCRDelegate?, _ completionHandler: @escaping (String) -> Void){
         self.delegate = delegate
         self.recognize(image, completionHandler)
     }
@@ -80,7 +80,7 @@ open class SwiftOCR {
      
      */
     
-    open   func recognize(_ image: OCRImage, _ completionHandler: @escaping (String) -> Void){
+    open   func recognize(_ image: UIImage, _ completionHandler: @escaping (String) -> Void){
         
         func indexToCharacter(_ index: Int) -> Character {
             return Array(recognizableCharacters.characters)[index]
@@ -98,9 +98,18 @@ open class SwiftOCR {
             
             let blobs                  = self.extractBlobs(preprocessedImage)
             var recognizedString       = ""
-            var ocrRecognizedBlobArray = [SwiftOCRRecognizedBlob]()
+//            var ocrRecognizedBlobArray = [SwiftOCRRecognizedBlob]()
             
             for blob in blobs {
+                do {
+                    // Scale sketch to max 20px in both dimmensions
+                    let scaledImage = self.scale(blob.0, to: CGSize(width: 20, height: 20))
+                    // Center sketch in 28x28 white box
+                    let character = self.addBorder(to: scaledImage)
+                    
+                    let recognizedDigital = self.xgDigitalRecognizeService.recognizeDigital(withImg: character)
+                    recognizedString.append(String(recognizedDigital))
+                }
 //                do {
 //                    let blobData       = self.convertImageToFloatArray(blob.0, resize: true)
 //                    let networkResult  = try self.network.update(inputs: blobData)
@@ -151,7 +160,7 @@ open class SwiftOCR {
                 
             }
             
-            self.currentOCRRecognizedBlobs = ocrRecognizedBlobArray
+//            self.currentOCRRecognizedBlobs = ocrRecognizedBlobArray
             completionHandler(recognizedString)
         }
     }
@@ -166,16 +175,16 @@ open class SwiftOCR {
      
      */
     
-    open   func recognizeInRect(_ image: OCRImage, rect: CGRect, completionHandler: @escaping (String) -> Void){
+    open   func recognizeInRect(_ image: UIImage, rect: CGRect, completionHandler: @escaping (String) -> Void){
         DispatchQueue.global(qos: .userInitiated).async {
             #if os(iOS)
                 let cgImage        = image.cgImage
                 let croppedCGImage = cgImage?.cropping(to: rect)!
-                let croppedImage   = OCRImage(cgImage: croppedCGImage!)
+                let croppedImage   = UIImage(cgImage: croppedCGImage!)
             #else
                 let cgImage        = image.cgImage(forProposedRect: nil, context: nil, hints: nil)!
                 let croppedCGImage = cgImage.cropping(to: rect)!
-                let croppedImage   = OCRImage(cgImage: croppedCGImage, size: rect.size)
+                let croppedImage   = UIImage(cgImage: croppedCGImage, size: rect.size)
             #endif
             
             self.recognize(croppedImage, completionHandler)
@@ -192,7 +201,7 @@ open class SwiftOCR {
      
      */
     
-    internal func extractBlobs(_ image: OCRImage) -> [(OCRImage, CGRect)] {
+    internal func extractBlobs(_ image: UIImage) -> [(UIImage, CGRect)] {
         
         #if os(iOS)
             let pixelData = image.cgImage?.dataProvider?.data
@@ -440,7 +449,7 @@ open class SwiftOCR {
         
         mergeLabelRects = filteredMergeLabelRects
         
-        var outputImages = [(OCRImage, CGRect)]()
+        var outputImages = [(UIImage, CGRect)]()
         
         //MARK: Crop image to blob
         
@@ -472,9 +481,9 @@ open class SwiftOCR {
      
      */
     
-    internal func resizeBlobs(_ blobImages: [OCRImage]) -> [OCRImage] {
+    internal func resizeBlobs(_ blobImages: [UIImage]) -> [UIImage] {
         
-        var resizedBlobs = [OCRImage]()
+        var resizedBlobs = [UIImage]()
         
         for blobImage in blobImages {
             let cropSize = CGSize(width: 16, height: 20)
@@ -503,12 +512,12 @@ open class SwiftOCR {
             let resizedCGImage = context?.makeImage()?.cropping(to: CGRect(x: 0, y: 0, width: cropSize.width, height: cropSize.height))!
             
             #if os(iOS)
-                let resizedOCRImage = UIImage(cgImage: resizedCGImage!)
+                let resizedUIImage = UIImage(cgImage: resizedCGImage!)
             #else
-                let resizedOCRImage = NSImage(cgImage: resizedCGImage!, size: cropSize)
+                let resizedUIImage = NSImage(cgImage: resizedCGImage!, size: cropSize)
             #endif
             
-            resizedBlobs.append(resizedOCRImage)
+            resizedBlobs.append(resizedUIImage)
         }
         
         return resizedBlobs
@@ -524,9 +533,9 @@ open class SwiftOCR {
      
      */
     
-    open func preprocessImageForOCR(_ image:OCRImage) -> OCRImage {
+    open func preprocessImageForOCR(_ image:UIImage) -> UIImage {
         
-        func getDodgeBlendImage(_ inputImage: OCRImage) -> OCRImage {
+        func getDodgeBlendImage(_ inputImage: UIImage) -> UIImage {
             let image  = GPUImagePicture(image: inputImage)
             let image2 = GPUImagePicture(image: inputImage)
             
@@ -567,7 +576,7 @@ open class SwiftOCR {
             dodgeBlendFilter.useNextFrameForImageCapture()
             image?.processImage()
             
-            var processedImage:OCRImage? = dodgeBlendFilter.imageFromCurrentFramebuffer(with: UIImageOrientation.up)
+            var processedImage:UIImage? = dodgeBlendFilter.imageFromCurrentFramebuffer(with: UIImageOrientation.up)
             
             while processedImage?.size == CGSize.zero || processedImage == nil {
                 dodgeBlendFilter.useNextFrameForImageCapture()
@@ -609,7 +618,7 @@ open class SwiftOCR {
         thresholdFilter.useNextFrameForImageCapture()
         picture?.processImage()
         
-        var processedImage:OCRImage? = thresholdFilter.imageFromCurrentFramebuffer(with: UIImageOrientation.up)
+        var processedImage:UIImage? = thresholdFilter.imageFromCurrentFramebuffer(with: UIImageOrientation.up)
         
         while processedImage == nil || processedImage?.size == CGSize.zero {
             thresholdFilter.useNextFrameForImageCapture()
@@ -621,59 +630,29 @@ open class SwiftOCR {
         
     }
     
-    /**
-     
-     Takes an image and converts it to an array of floats. The array gets generated by taking the pixel-data of the red channel and then converting it into floats. This array can be used as input for the neural network.
-     
-     - Parameter image:  The image which should get converted to the float array.
-     - Parameter resize: If you set this to true, the image firsts gets resized. The default value is `true`.
-     - Returns:          The array containing the pixel-data of the red channel.
-     
-     */
-    
-    internal func convertImageToFloatArray(_ image: OCRImage, resize: Bool = true) -> [Float] {
-        
-        let resizedBlob: OCRImage = {
-            if resize {
-                return resizeBlobs([image]).first!
-            } else {
-                return image
-            }
-        }()
-        
-        #if os(iOS)
-            let pixelData  = resizedBlob.cgImage?.dataProvider?.data
-            let bitmapData: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
-            let cgImage    = resizedBlob.cgImage
-        #else
-            let bitmapRep  = NSBitmapImageRep(data: resizedBlob.tiffRepresentation!)!
-            let bitmapData = bitmapRep.bitmapData!
-            let cgImage    = bitmapRep.cgImage
-        #endif
-        
-        let numberOfComponents = (cgImage?.bitsPerPixel)! / (cgImage?.bitsPerComponent)!
-        
-        var imageData = [Float]()
-        
-        let height = Int(resizedBlob.size.height)
-        let width  = Int(resizedBlob.size.width)
-        
-        for yPixelInfo in stride(from: 0, to: height*width*numberOfComponents, by: width*numberOfComponents) {
-            for xPixelInfo in stride(from: 0, to: width*numberOfComponents, by: numberOfComponents) {
-                let pixelInfo: Int = yPixelInfo + xPixelInfo
-                
-                imageData.append(bitmapData[pixelInfo] < 127 ? 0 : 1)
-                
-            }
-        }
-        
-        let aspectRatio = Float(image.size.width / image.size.height)
-        
-        imageData.append(aspectRatio)
-        
-        return imageData
+    /// Scales the given image to the provided size.
+    fileprivate func scale(_ image: UIImage, to: CGSize) -> UIImage {
+        let size = CGSize(width: min(20 * image.size.width / image.size.height, 20),
+                          height: min(20 * image.size.height / image.size.width, 20))
+        let newRect = CGRect(x: 0, y: 0, width: size.width, height: size.height).integral
+        UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
+        let context = UIGraphicsGetCurrentContext()
+        context?.interpolationQuality = .none
+        image.draw(in: newRect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        return newImage
     }
     
+    /// Centers the given image in a clear 28x28 canvas and returns the result.
+    fileprivate func addBorder(to image: UIImage) -> UIImage {
+        UIGraphicsBeginImageContext(CGSize(width: 28, height: 28))
+        image.draw(at: CGPoint(x: (28 - image.size.width) / 2,
+                               y: (28 - image.size.height) / 2))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        return newImage
+    }    
 }
 
 // MARK: SwiftOCRDelegate
@@ -689,12 +668,12 @@ public protocol SwiftOCRDelegate: class {
      
      */
     
-    func preprocessImageForOCR(_ inputImage: OCRImage) -> OCRImage?
+    func preprocessImageForOCR(_ inputImage: UIImage) -> UIImage?
     
 }
 
 extension SwiftOCRDelegate {
-    func preprocessImageForOCR(_ inputImage: OCRImage) -> OCRImage? {
+    func preprocessImageForOCR(_ inputImage: UIImage) -> UIImage? {
         return nil
     }
 }

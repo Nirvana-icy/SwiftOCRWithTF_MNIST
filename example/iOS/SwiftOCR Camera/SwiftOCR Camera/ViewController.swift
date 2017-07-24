@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import SwiftOCR
+//import SwiftOCR
 import AVFoundation
 
 extension UIImage {

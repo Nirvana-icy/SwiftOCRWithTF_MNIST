@@ -20,7 +20,6 @@
 		E08273B31F25D363006A68D8 /* SwiftOCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08273B21F25D363006A68D8 /* SwiftOCR.swift */; };
 		E08273B61F25D376006A68D8 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08273B41F25D376006A68D8 /* Extensions.swift */; };
 		E08273B71F25D376006A68D8 /* UnionFind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08273B51F25D376006A68D8 /* UnionFind.swift */; };
-		E08273B91F25D37E006A68D8 /* CrossPlatformSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08273B81F25D37E006A68D8 /* CrossPlatformSupport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,7 +77,6 @@
 		E08273B21F25D363006A68D8 /* SwiftOCR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftOCR.swift; sourceTree = "<group>"; };
 		E08273B41F25D376006A68D8 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		E08273B51F25D376006A68D8 /* UnionFind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnionFind.swift; sourceTree = "<group>"; };
-		E08273B81F25D37E006A68D8 /* CrossPlatformSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossPlatformSupport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,13 +129,12 @@
 				37E1209A1CDA5E6B00FC2701 /* Assets.xcassets */,
 				37E1209C1CDA5E6B00FC2701 /* LaunchScreen.storyboard */,
 				37E1209F1CDA5E6B00FC2701 /* Info.plist */,
-				E07FDB101F21EA0200CB51F5 /* SwiftOCR Camera-Bridging-Header.h */,
-				E07FDB1A1F21EB5A00CB51F5 /* XGDigitalRecognizeService.h */,
-				E07FDB181F21EB3300CB51F5 /* XGDigitalRecognizeService.mm */,
 				E08273B21F25D363006A68D8 /* SwiftOCR.swift */,
 				E08273B41F25D376006A68D8 /* Extensions.swift */,
 				E08273B51F25D376006A68D8 /* UnionFind.swift */,
-				E08273B81F25D37E006A68D8 /* CrossPlatformSupport.swift */,
+				E07FDB101F21EA0200CB51F5 /* SwiftOCR Camera-Bridging-Header.h */,
+				E07FDB1A1F21EB5A00CB51F5 /* XGDigitalRecognizeService.h */,
+				E07FDB181F21EB3300CB51F5 /* XGDigitalRecognizeService.mm */,
 			);
 			path = "SwiftOCR Camera";
 			sourceTree = "<group>";
@@ -254,7 +251,6 @@
 				E07FDB191F21EB3300CB51F5 /* XGDigitalRecognizeService.mm in Sources */,
 				E08273B31F25D363006A68D8 /* SwiftOCR.swift in Sources */,
 				E08273B71F25D376006A68D8 /* UnionFind.swift in Sources */,
-				E08273B91F25D37E006A68D8 /* CrossPlatformSupport.swift in Sources */,
 				37E120941CDA5E6B00FC2701 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

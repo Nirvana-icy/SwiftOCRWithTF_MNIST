@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../../../framework/SwiftOCR/SwiftOCRTraining.swift"
-            timestampString = "522229578.493558"
+            filePath = "SwiftOCR Camera/SwiftOCR.swift"
+            timestampString = "522576982.937476"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "203"
-            endingLineNumber = "203"
-            landmarkName = "generateRealisticCharSet(_:)"
+            startingLineNumber = "111"
+            endingLineNumber = "111"
+            landmarkName = "recognize(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -11,4 +11,6 @@
 
 @interface XGDigitalRecognizeService : NSObject
 
+-(NSInteger)recognizeDigitalWithImg:(UIImage *)orignalImage;
+
 @end
